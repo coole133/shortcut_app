@@ -1,28 +1,36 @@
-import React, {useCallback, useContext} from "react";
+import React, {useCallback, useContext, useState} from "react";
 import {Link} from "react-router-dom"
 import {AuthContext} from "../context/AuthContext";
 import {useHttp} from "../hooks/http.hook";
 import {useMessage} from "../hooks/message.hook";
 
 export const LinksList = ({links}) => {
+    const [updatedLinks, setUpdatedLinks] = useState(links)
     const message = useMessage()
     const {token} = useContext(AuthContext)
     const {request} = useHttp()
+
+    const handleUpdateLinks = useCallback((id) => {
+        console.log(links)
+        let newLinks = links.filter((link) => link._id !== id)
+        console.log(newLinks)
+        setUpdatedLinks(newLinks)
+    }, [links])
 
     const handleDelete = useCallback(async (id) => {
         try {
             const data = await request('/api/link/delete', 'DELETE', {id: id},
                 {Authorization: `Bearer ${token}`})
             message(data.message)
-        } catch (e) {
-        }
-    }, [token, message, request])
-
+        } catch (e) { }
+        handleUpdateLinks(id)
+    }, [token, message, request, handleUpdateLinks])
 
     if (!links.length) {
         return <p className='center'>No urls</p>
     }
 
+    console.log(updatedLinks)
 
     return (
         <table>
@@ -36,7 +44,7 @@ export const LinksList = ({links}) => {
             </tr>
             </thead>
             <tbody>
-            {links.map((link, index) => {
+            {updatedLinks.length !== 0 && updatedLinks.map((link, index) => {
                 return (
                     <tr key={link._id}>
                         <td>{index + 1}</td>

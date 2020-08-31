@@ -28,7 +28,7 @@ export const LinksPage = () => {
 
     return (
         <>
-            {!loading && <LinksList links={links}/>}
+            {!loading && links.length !== 0 && <LinksList links={links}/>}
         </>
     )
 }
